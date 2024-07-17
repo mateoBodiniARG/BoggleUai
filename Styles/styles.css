@@ -1,0 +1,325 @@
+body {
+  font-family: "Roboto", Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background-color: #ffffff;
+  color: #333;
+  text-align: center;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+nav {
+  background-color: #f8f8f8;
+  padding: 0.75rem;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+
+nav ul li {
+  margin: 0 1.5rem;
+}
+
+nav ul li a {
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+  font-size: 1.1rem;
+}
+
+nav ul li a:hover {
+  color: #000;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 2rem;
+}
+
+section {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 500px;
+}
+
+h2 {
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+#formulario-inicio {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+  color: #333;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+  margin-bottom: 1rem;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #333;
+}
+
+button {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 1rem;
+  font-weight: 600;
+  width: 100%;
+}
+
+button:hover {
+  background-color: #000;
+}
+
+#info-juego {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+#tablero {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.letra {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.letra:hover {
+  background-color: #e0e0e0;
+}
+
+#controles-juego {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+#palabra-actual {
+  flex-grow: 1;
+  margin-right: 1rem;
+}
+
+#palabras-encontradas h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+#palabras-encontradas ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+#palabras-encontradas li {
+  background-color: #f0f0f0;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+#fin-juego h2 {
+  margin-bottom: 1rem;
+}
+
+#fin-juego p {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+footer {
+  background-color: #f8f8f8;
+  color: #333;
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+  border-top: 1px solid #e0e0e0;
+}
+
+footer a {
+  color: #000;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+footer a:hover {
+  color: #333;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-contenido {
+  background-color: white;
+  padding: 2.5rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.oculto {
+  display: none;
+}
+
+textarea {
+  resize: none;
+  width: 100%;
+  height: 100px;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+  margin-bottom: 1rem;
+}
+
+#resultados-boggle h2 {
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+#resultados-boggle ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+#resultados-boggle li {
+  background-color: #f0f0f0;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+#fin-juego button {
+  margin-right: 1rem;
+}
+
+.seleccionada {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+
+
+@media (max-width: 600px) {
+  section {
+    padding: 2rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  input,
+  select,
+  button {
+    font-size: 0.95rem;
+  }
+
+  .letra {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+
+  #info-juego {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #info-juego p {
+    margin-bottom: 0.5rem;
+  }
+}

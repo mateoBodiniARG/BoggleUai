@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boggle - Juego de Palabras</title>
+    <link rel="stylesheet" href="Styles/styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Boggle</h1>
+      <nav>
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="Html/contacto.html">Contacto</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section id="inicio-juego">
+        <h2>Bienvenido a Boggle</h2>
+        <form id="formulario-inicio">
+          <label for="nombre-jugador">Nombre del jugador:</label>
+          <input
+            type="text"
+            id="nombre-jugador"
+            name="nombre-jugador"
+            required
+            minlength="3"
+          />
+          <label for="tiempo-juego">Selecciona el tiempo de juego:</label>
+          <select id="tiempo-juego" name="tiempo-juego">
+            <option value="60">1 minuto</option>
+            <option value="120">2 minutos</option>
+            <option value="180">3 minutos</option>
+          </select>
+          <button type="submit">Iniciar Juego</button>
+        </form>
+      </section>
+
+      <section id="juego" class="oculto">
+        <div id="info-juego">
+          <p>Jugador: <span id="nombre-jugador-actual"></span></p>
+          <p>Tiempo restante: <span id="temporizador"></span></p>
+          <p>Puntaje: <span id="puntaje">0</span></p>
+        </div>
+
+        <div id="tablero">
+          <!-- Las letras se generarán dinámicamente con JavaScript -->
+        </div>
+
+        <div id="controles-juego">
+          <input type="text" id="palabra-actual" readonly />
+          <button id="enviar-palabra">Enviar Palabra</button>
+        </div>
+
+        <div id="palabras-encontradas">
+          <h3>Palabras encontradas:</h3>
+          <ul id="lista-palabras"></ul>
+        </div>
+      </section>
+
+      <section id="fin-juego" class="oculto">
+        <h2>Juego Terminado</h2>
+        <p>Puntaje final: <span id="puntaje-final"></span></p>
+        <button id="jugar-nuevamente">Jugar Nuevamente</button>
+        <button id="ver-resultados">Ver Resultados</button>
+      </section>
+
+      <section id="resultados-boggle" class="oculto">
+        <h2>Resultados Boggle</h2>
+        <ul id="lista-resultados">
+          <!-- Los resultados se cargarán dinámicamente -->
+        </ul>
+        <button id="volver-inicio">Volver al Inicio</button>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        Desarrollado por Mateo Bodini y Lucas Quaroni -
+        <a href="" target="_blank">Ver código en GitHub</a>
+      </p>
+    </footer>
+
+    <div id="modal" class="modal oculto">
+      <div class="modal-contenido">
+        <h3 id="modal-titulo"></h3>
+        <p id="modal-mensaje"></p>
+        <button id="modal-cerrar">Cerrar</button>
+      </div>
+    </div>
+
+    <script src="Js/app.js"></script>
+  </body>
+</html>
