@@ -48,10 +48,7 @@ function iniciarJuego(event) {
   tiempoJuego = parseInt(document.getElementById("tiempo-juego").value);
 
   if (nombreJugador.length < 3) {
-    mostrarModal(
-      "Error",
-      "El nombre del jugador debe tener al menos 3 letras."
-    );
+    mostrarModal("Error", "El nombre del jugador debe tener al menos 3 letras.");
     return;
   }
 
@@ -184,6 +181,7 @@ function esPalabraValida(palabra) {
 
 function iniciarTemporizador() {
   var tiempoRestante = tiempoJuego;
+  spanTemporizador.textContent = tiempoRestante; // Mostrar el tiempo inicial
   temporizador = setInterval(function () {
     tiempoRestante--;
     spanTemporizador.textContent = tiempoRestante;
@@ -221,7 +219,8 @@ function guardarResultado() {
     puntaje: puntaje,
     fecha: new Date().toISOString(),
   });
-  localStorage.setItem("resultadosBoggle", JSON.stringify(resultados));
+
+  localStorage.setItem("resultadosBoggle", JSON.stringify(resultados)); // Corregido el nombre de la clave
 }
 
 function mostrarResultados() {
@@ -233,12 +232,10 @@ function mostrarResultados() {
 
   var resultados = JSON.parse(localStorage.getItem("resultadosBoggle")) || [];
   resultados
-    .sort((a, b) => b.puntaje - a.puntaje) // Ordenar por puntaje descendente
+    .sort(function (a, b) { return b.puntaje - a.puntaje; }) // Ordenar por puntaje descendente
     .forEach(function (resultado) {
       var li = document.createElement("li");
-      li.textContent = `${resultado.nombre} - ${
-        resultado.puntaje
-      } puntos (${new Date(resultado.fecha).toLocaleDateString("es-ES")})`;
+      li.textContent = resultado.nombre + " - " + resultado.puntaje + " puntos (" + new Date(resultado.fecha).toLocaleDateString("es-ES") + ")";
       listaResultados.appendChild(li);
     });
 }
@@ -272,5 +269,4 @@ function calcularPuntos(longitud) {
     return 11;
   } else {
     return 0;
-  }
 }
