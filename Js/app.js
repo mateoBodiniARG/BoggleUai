@@ -8,7 +8,7 @@ var puntaje;
 var tablero;
 var palabraActual;
 var palabrasEncontradas;
-var ultimaLetraSeleccionada;
+var letrasSeleccionadas;
 
 // Elementos del DOM
 var formInicio = document.getElementById("formulario-inicio");
@@ -54,7 +54,7 @@ function iniciarJuego(event) {
 
   puntaje = 0;
   palabrasEncontradas = [];
-  ultimaLetraSeleccionada = null;
+  letrasSeleccionadas = [];
 
   spanNombreJugador.textContent = nombreJugador;
   spanPuntaje.textContent = puntaje;
@@ -67,53 +67,68 @@ function iniciarJuego(event) {
 }
 
 function generarTablero() {
-  tablero = [];
-  divTablero.innerHTML = "";
   var letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  var columnasTablero = document.querySelectorAll('.columna-tablero');
 
-  for (var i = 0; i < 4; i++) {
-    tablero[i] = [];
-    for (var j = 0; j < 4; j++) {
+  columnasTablero.forEach(function(columna) {
+    columna.innerHTML = ""; // Limpiamos el contenido previo de la columna
+
+    for (var i = 0; i < 4; i++) {
       var letra = letras.charAt(Math.floor(Math.random() * letras.length));
-      tablero[i][j] = letra;
 
       var letraDiv = document.createElement("div");
       letraDiv.className = "letra";
       letraDiv.textContent = letra;
       letraDiv.dataset.fila = i;
-      letraDiv.dataset.columna = j;
+      letraDiv.dataset.columna = columna.dataset.columna; // Asignamos la columna a través del dataset
       letraDiv.addEventListener("click", seleccionarLetra);
-      divTablero.appendChild(letraDiv);
+
+      columna.appendChild(letraDiv);
     }
-  }
+  });
 }
+
 
 function seleccionarLetra(event) {
   var letraDiv = event.target;
   var fila = parseInt(letraDiv.dataset.fila);
   var columna = parseInt(letraDiv.dataset.columna);
 
+  // Verifica si la letra seleccionada puede ser añadida a la palabra actual
   if (!esLetraContigua(fila, columna)) {
     return;
   }
 
-  // Verifica si la letra ya fue seleccionada
-  if (letraDiv.classList.contains("seleccionada")) {
+  // Verifica si la letra ya ha sido seleccionada
+  if (letrasSeleccionadas.some(function(item) {
+    return item.fila === fila && item.columna === columna;
+  })) {
     return;
   }
 
+  // Añade la letra seleccionada al array de letras seleccionadas
+  letrasSeleccionadas.push({
+    letra: letraDiv.textContent,
+    fila: fila,
+    columna: columna
+  });
+
+  // Actualiza el input de la palabra actual con todas las letras seleccionadas
+  inputPalabraActual.value = letrasSeleccionadas.map(item => item.letra).join('');
+
+  // Agrega una clase para marcar visualmente la letra como seleccionada
   letraDiv.classList.add("seleccionada");
-  ultimaLetraSeleccionada = { fila: fila, columna: columna };
-  inputPalabraActual.value += letraDiv.textContent;
 }
 
 function esLetraContigua(fila, columna) {
-  if (!ultimaLetraSeleccionada) {
+  var ultimaLetra = letrasSeleccionadas[letrasSeleccionadas.length - 1];
+
+  if (!ultimaLetra) {
     return true;
   }
 
-  var filaAnterior = ultimaLetraSeleccionada.fila;
-  var columnaAnterior = ultimaLetraSeleccionada.columna;
+  var filaAnterior = ultimaLetra.fila;
+  var columnaAnterior = ultimaLetra.columna;
 
   return (
     Math.abs(fila - filaAnterior) <= 1 &&
@@ -134,20 +149,34 @@ function enviarPalabra() {
     return;
   }
 
+  if (!esPalabraValida(palabra)) {
+    mostrarModal("Error", "Esta palabra no es válida.");
+    return;
+  }
+
   palabrasEncontradas.push(palabra);
-  puntaje += palabra.length;
+  puntaje += calcularPuntos(palabra.length);
   spanPuntaje.textContent = puntaje;
 
   var li = document.createElement("li");
   li.textContent = palabra;
   listaPalabras.appendChild(li);
 
+  // Limpia el array de letras seleccionadas y el input de la palabra actual
+  letrasSeleccionadas = [];
   inputPalabraActual.value = "";
-  ultimaLetraSeleccionada = null;
-  var letrasSeleccionadas = document.querySelectorAll(".letra.seleccionada");
-  letrasSeleccionadas.forEach(function (letra) {
+
+  // Reinicia la visualización de letras seleccionadas en el tablero
+  var letrasSeleccionadasDOM = document.querySelectorAll(".letra.seleccionada");
+  letrasSeleccionadasDOM.forEach(function (letra) {
     letra.classList.remove("seleccionada");
   });
+}
+
+function esPalabraValida(palabra) {
+  // Aquí deberías implementar la validación de la palabra contra un diccionario
+  // En este ejemplo, simplemente se valida que tenga más de 3 letras
+  return palabra.length >= 3;
 }
 
 function iniciarTemporizador() {
@@ -190,6 +219,7 @@ function guardarResultado() {
     puntaje: puntaje,
     fecha: new Date().toISOString(),
   });
+
   localStorage.setItem("resultadosBoggle", JSON.stringify(resultados)); // Corregido el nombre de la clave
 }
 
@@ -223,4 +253,20 @@ function mostrarModal(titulo, mensaje) {
 
 function cerrarModal() {
   modal.classList.add("oculto");
+}
+
+// Función para calcular puntos según la longitud de la palabra
+function calcularPuntos(longitud) {
+  if (longitud === 3 || longitud === 4) {
+    return 1;
+  } else if (longitud === 5) {
+    return 2;
+  } else if (longitud === 6) {
+    return 3;
+  } else if (longitud === 7) {
+    return 5;
+  } else if (longitud >= 8) {
+    return 11;
+  } else {
+    return 0;
 }
