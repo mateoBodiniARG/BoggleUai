@@ -5,7 +5,6 @@ var nombreJugador;
 var tiempoJuego;
 var temporizador;
 var puntaje;
-var tablero;
 var palabraActual;
 var palabrasEncontradas;
 var letrasSeleccionadas;
@@ -58,6 +57,7 @@ function iniciarJuego(event) {
 
   spanNombreJugador.textContent = nombreJugador;
   spanPuntaje.textContent = puntaje;
+  listaPalabras.innerHTML = ""; // Limpiar la lista de palabras encontradas
 
   generarTablero();
   iniciarTemporizador();
@@ -70,8 +70,9 @@ function generarTablero() {
   var letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   var columnasTablero = document.querySelectorAll('.columna-tablero');
 
-  columnasTablero.forEach(function(columna) {
+  columnasTablero.forEach(function(columna, index) {
     columna.innerHTML = ""; // Limpiamos el contenido previo de la columna
+    columna.dataset.columna = index; // Asignamos la columna a través del dataset
 
     for (var i = 0; i < 4; i++) {
       var letra = letras.charAt(Math.floor(Math.random() * letras.length));
@@ -80,14 +81,13 @@ function generarTablero() {
       letraDiv.className = "letra";
       letraDiv.textContent = letra;
       letraDiv.dataset.fila = i;
-      letraDiv.dataset.columna = columna.dataset.columna; // Asignamos la columna a través del dataset
+      letraDiv.dataset.columna = index; // Asignamos la columna a través del dataset
       letraDiv.addEventListener("click", seleccionarLetra);
 
       columna.appendChild(letraDiv);
     }
   });
 }
-
 
 function seleccionarLetra(event) {
   var letraDiv = event.target;
@@ -114,7 +114,9 @@ function seleccionarLetra(event) {
   });
 
   // Actualiza el input de la palabra actual con todas las letras seleccionadas
-  inputPalabraActual.value = letrasSeleccionadas.map(item => item.letra).join('');
+  inputPalabraActual.value = letrasSeleccionadas.map(function(item) {
+    return item.letra;
+  }).join('');
 
   // Agrega una clase para marcar visualmente la letra como seleccionada
   letraDiv.classList.add("seleccionada");
@@ -179,6 +181,10 @@ function esPalabraValida(palabra) {
   return palabra.length >= 3;
 }
 
+function calcularPuntos(longitudPalabra) {
+  return longitudPalabra; // Puedes ajustar esta lógica según el sistema de puntuación deseado
+}
+
 function iniciarTemporizador() {
   var tiempoRestante = tiempoJuego;
   spanTemporizador.textContent = tiempoRestante; // Mostrar el tiempo inicial
@@ -220,7 +226,7 @@ function guardarResultado() {
     fecha: new Date().toISOString(),
   });
 
-  localStorage.setItem("resultadosBoggle", JSON.stringify(resultados)); // Corregido el nombre de la clave
+  localStorage.setItem("resultadosBoggle", JSON.stringify(resultados));
 }
 
 function mostrarResultados() {
@@ -232,10 +238,10 @@ function mostrarResultados() {
 
   var resultados = JSON.parse(localStorage.getItem("resultadosBoggle")) || [];
   resultados
-    .sort(function (a, b) { return b.puntaje - a.puntaje; }) // Ordenar por puntaje descendente
+    .sort(function (a, b) { return b.puntaje - a.puntaje; }) // Ordena por puntaje de mayor a menor
     .forEach(function (resultado) {
       var li = document.createElement("li");
-      li.textContent = resultado.nombre + " - " + resultado.puntaje + " puntos (" + new Date(resultado.fecha).toLocaleDateString("es-ES") + ")";
+      li.textContent = resultado.nombre + " - " + resultado.puntaje + " puntos - " + new Date(resultado.fecha).toLocaleDateString();
       listaResultados.appendChild(li);
     });
 }
@@ -248,25 +254,9 @@ function volverAlInicio() {
 function mostrarModal(titulo, mensaje) {
   modalTitulo.textContent = titulo;
   modalMensaje.textContent = mensaje;
-  modal.classList.remove("oculto");
+  modal.style.display = "block";
 }
 
 function cerrarModal() {
-  modal.classList.add("oculto");
-}
-
-// Función para calcular puntos según la longitud de la palabra
-function calcularPuntos(longitud) {
-  if (longitud === 3 || longitud === 4) {
-    return 1;
-  } else if (longitud === 5) {
-    return 2;
-  } else if (longitud === 6) {
-    return 3;
-  } else if (longitud === 7) {
-    return 5;
-  } else if (longitud >= 8) {
-    return 11;
-  } else {
-    return 0;
+  modal.style.display = "none";
 }
