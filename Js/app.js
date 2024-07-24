@@ -47,7 +47,10 @@ function iniciarJuego(event) {
   tiempoJuego = parseInt(document.getElementById("tiempo-juego").value);
 
   if (nombreJugador.length < 3) {
-    mostrarModal("Error", "El nombre del jugador debe tener al menos 3 letras.");
+    mostrarModal(
+      "Error",
+      "El nombre del jugador debe tener al menos 3 letras."
+    );
     return;
   }
 
@@ -57,7 +60,7 @@ function iniciarJuego(event) {
 
   spanNombreJugador.textContent = nombreJugador;
   spanPuntaje.textContent = puntaje;
-  listaPalabras.innerHTML = ""; // Limpiar la lista de palabras encontradas
+  listaPalabras.innerHTML = "";
 
   generarTablero();
   iniciarTemporizador();
@@ -68,11 +71,11 @@ function iniciarJuego(event) {
 
 function generarTablero() {
   var letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  var columnasTablero = document.querySelectorAll('.columna-tablero');
+  var columnasTablero = document.querySelectorAll(".columna-tablero");
 
-  columnasTablero.forEach(function(columna, index) {
-    columna.innerHTML = ""; // Limpiamos el contenido previo de la columna
-    columna.dataset.columna = index; // Asignamos la columna a través del dataset
+  columnasTablero.forEach(function (columna, index) {
+    columna.innerHTML = ""; 
+    columna.dataset.columna = index; 
 
     for (var i = 0; i < 4; i++) {
       var letra = letras.charAt(Math.floor(Math.random() * letras.length));
@@ -81,7 +84,7 @@ function generarTablero() {
       letraDiv.className = "letra";
       letraDiv.textContent = letra;
       letraDiv.dataset.fila = i;
-      letraDiv.dataset.columna = index; // Asignamos la columna a través del dataset
+      letraDiv.dataset.columna = index;
       letraDiv.addEventListener("click", seleccionarLetra);
 
       columna.appendChild(letraDiv);
@@ -94,32 +97,81 @@ function seleccionarLetra(event) {
   var fila = parseInt(letraDiv.dataset.fila);
   var columna = parseInt(letraDiv.dataset.columna);
 
-  // Verifica si la letra seleccionada puede ser añadida a la palabra actual
   if (!esLetraContigua(fila, columna)) {
     return;
   }
 
-  // Verifica si la letra ya ha sido seleccionada
   if (letrasSeleccionadas.some(function(item) {
     return item.fila === fila && item.columna === columna;
   })) {
     return;
   }
 
-  // Añade la letra seleccionada al array de letras seleccionadas
   letrasSeleccionadas.push({
     letra: letraDiv.textContent,
     fila: fila,
     columna: columna
   });
 
-  // Actualiza el input de la palabra actual con todas las letras seleccionadas
   inputPalabraActual.value = letrasSeleccionadas.map(function(item) {
     return item.letra;
   }).join('');
 
-  // Agrega una clase para marcar visualmente la letra como seleccionada
   letraDiv.classList.add("seleccionada");
+
+  actualizarUltimaSeleccionada();
+}
+
+function actualizarUltimaSeleccionada() {
+  var ultimaSeleccionadaAnterior = document.querySelector('.ultima-seleccionada');
+  if (ultimaSeleccionadaAnterior) {
+    ultimaSeleccionadaAnterior.classList.remove('ultima-seleccionada');
+  }
+
+  if (letrasSeleccionadas.length > 0) {
+    var ultimaSeleccionadaActual = letrasSeleccionadas[letrasSeleccionadas.length - 1];
+    var selector = `.columna-tablero:nth-child(${ultimaSeleccionadaActual.columna + 1}) .letra:nth-child(${ultimaSeleccionadaActual.fila + 1})`;
+    var ultimaLetraDiv = document.querySelector(selector);
+    if (ultimaLetraDiv) {
+      ultimaLetraDiv.classList.add('ultima-seleccionada');
+    }
+  }
+}
+
+function enviarPalabra() {
+  var palabra = inputPalabraActual.value.toLowerCase();
+
+  if (palabra.length < 3) {
+    mostrarModal("Error", "La palabra debe tener al menos 3 letras.");
+    return;
+  }
+
+  if (palabrasEncontradas.includes(palabra)) {
+    mostrarModal("Error", "Esta palabra ya ha sido encontrada.");
+    return;
+  }
+
+  if (!esPalabraValida(palabra)) {
+    mostrarModal("Error", "Esta palabra no es válida.");
+    return;
+  }
+
+  palabrasEncontradas.push(palabra);
+  puntaje += calcularPuntos(palabra.length);
+  spanPuntaje.textContent = puntaje;
+
+  var li = document.createElement("li");
+  li.textContent = palabra;
+  listaPalabras.appendChild(li);
+
+  letrasSeleccionadas = [];
+  inputPalabraActual.value = "";
+
+  var letrasSeleccionadasDOM = document.querySelectorAll(".letra.seleccionada");
+  letrasSeleccionadasDOM.forEach(function (letra) {
+    letra.classList.remove("seleccionada");
+    letra.classList.remove("ultima-seleccionada");
+  });
 }
 
 function esLetraContigua(fila, columna) {
@@ -164,11 +216,9 @@ function enviarPalabra() {
   li.textContent = palabra;
   listaPalabras.appendChild(li);
 
-  // Limpia el array de letras seleccionadas y el input de la palabra actual
   letrasSeleccionadas = [];
   inputPalabraActual.value = "";
 
-  // Reinicia la visualización de letras seleccionadas en el tablero
   var letrasSeleccionadasDOM = document.querySelectorAll(".letra.seleccionada");
   letrasSeleccionadasDOM.forEach(function (letra) {
     letra.classList.remove("seleccionada");
@@ -176,18 +226,16 @@ function enviarPalabra() {
 }
 
 function esPalabraValida(palabra) {
-  // Aquí deberías implementar la validación de la palabra contra un diccionario
-  // En este ejemplo, simplemente se valida que tenga más de 3 letras
   return palabra.length >= 3;
 }
 
 function calcularPuntos(longitudPalabra) {
-  return longitudPalabra; // Puedes ajustar esta lógica según el sistema de puntuación deseado
+  return longitudPalabra;
 }
 
 function iniciarTemporizador() {
   var tiempoRestante = tiempoJuego;
-  spanTemporizador.textContent = tiempoRestante; // Mostrar el tiempo inicial
+  spanTemporizador.textContent = tiempoRestante;
   temporizador = setInterval(function () {
     tiempoRestante--;
     spanTemporizador.textContent = tiempoRestante;
@@ -238,10 +286,17 @@ function mostrarResultados() {
 
   var resultados = JSON.parse(localStorage.getItem("resultadosBoggle")) || [];
   resultados
-    .sort(function (a, b) { return b.puntaje - a.puntaje; }) // Ordena por puntaje de mayor a menor
+    .sort(function (a, b) {
+      return b.puntaje - a.puntaje;
+    })
     .forEach(function (resultado) {
       var li = document.createElement("li");
-      li.textContent = resultado.nombre + " - " + resultado.puntaje + " puntos - " + new Date(resultado.fecha).toLocaleDateString();
+      li.textContent =
+        resultado.nombre +
+        " - " +
+        resultado.puntaje +
+        " puntos - " +
+        new Date(resultado.fecha).toLocaleDateString();
       listaResultados.appendChild(li);
     });
 }
