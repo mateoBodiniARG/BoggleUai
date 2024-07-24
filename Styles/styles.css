@@ -150,8 +150,8 @@ button:hover {
 }
 
 .letra {
-  width: 60px; /* Ancho de cada letra */
-  height: 60px; /* Alto de cada letra */
+  width: 60px;
+  height: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -161,7 +161,7 @@ button:hover {
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s;
-  margin: 4px; /* Espacio entre las letras */
+  margin: 4px;
 }
 
 .letra:hover {
@@ -296,6 +296,9 @@ textarea {
   color: #ffffff;
 }
 
+.ultima-seleccionada {
+  border: 2px solid green;
+}
 
 
 @media (max-width: 600px) {
