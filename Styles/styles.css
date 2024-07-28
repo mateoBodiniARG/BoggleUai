@@ -139,10 +139,14 @@ button:hover {
 }
 
 #tablero {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.columna-tablero {
+  display: flex;
+  flex-direction: column;
 }
 
 .letra {
@@ -157,6 +161,7 @@ button:hover {
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s;
+  margin: 4px;
 }
 
 .letra:hover {
@@ -166,12 +171,16 @@ button:hover {
 #controles-juego {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
+  margin-top: 1rem;
+  gap: 1rem;
 }
 
 #palabra-actual {
-  flex-grow: 1;
-  margin-right: 1rem;
+  margin-bottom: 0;
+}
+
+#enviar-palabra {
+  margin-top: 0;
 }
 
 #palabras-encontradas h3 {
@@ -287,6 +296,9 @@ textarea {
   color: #ffffff;
 }
 
+.ultima-seleccionada {
+  border: 2px solid green;
+}
 
 
 @media (max-width: 600px) {

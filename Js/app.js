@@ -1,14 +1,11 @@
-"use strict";
-
 // Variables globales
 var nombreJugador;
 var tiempoJuego;
 var temporizador;
 var puntaje;
-var tablero;
 var palabraActual;
 var palabrasEncontradas;
-var ultimaLetraSeleccionada;
+var letrasSeleccionadas;
 
 // Elementos del DOM
 var formInicio = document.getElementById("formulario-inicio");
@@ -57,10 +54,11 @@ function iniciarJuego(event) {
 
   puntaje = 0;
   palabrasEncontradas = [];
-  ultimaLetraSeleccionada = null;
+  letrasSeleccionadas = [];
 
   spanNombreJugador.textContent = nombreJugador;
   spanPuntaje.textContent = puntaje;
+  listaPalabras.innerHTML = "";
 
   generarTablero();
   iniciarTemporizador();
@@ -70,25 +68,55 @@ function iniciarJuego(event) {
 }
 
 function generarTablero() {
-  tablero = [];
-  divTablero.innerHTML = "";
-  var letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  var vocales = "AEIOU";
+  var consonantes = "BCDFGHJKLMNPQRSTVWXYZ";
+  var tablero = [[], [], [], []];
+  var letras = [];
 
-  for (var i = 0; i < 4; i++) {
-    tablero[i] = [];
+  var totalCeldas = 16;
+  var cantidadVocales = Math.floor(totalCeldas * 0.4);
+  var cantidadConsonantes = totalCeldas - cantidadVocales;
+
+  for (var i = 0; i < cantidadVocales; i++) {
+    letras.push(obtenerLetraAleatoria(vocales));
+  }
+
+  for (var i = 0; i < cantidadConsonantes; i++) {
+    letras.push(obtenerLetraAleatoria(consonantes));
+  }
+
+  letras.sort(function () {
+    return 0.5 - Math.random();
+  });
+
+  for (var i = 0; i < tablero.length; i++) {
     for (var j = 0; j < 4; j++) {
-      var letra = letras.charAt(Math.floor(Math.random() * letras.length));
-      tablero[i][j] = letra;
+      tablero[i][j] = letras.pop();
+    }
+  }
+
+  var columnasTablero = document.querySelectorAll(".columna-tablero");
+  columnasTablero.forEach(function (columna, indice) {
+    columna.innerHTML = "";
+    columna.dataset.columna = indice;
+
+    for (var i = 0; i < 4; i++) {
+      var letra = tablero[i][indice];
 
       var letraDiv = document.createElement("div");
       letraDiv.className = "letra";
       letraDiv.textContent = letra;
       letraDiv.dataset.fila = i;
-      letraDiv.dataset.columna = j;
+      letraDiv.dataset.columna = indice;
       letraDiv.addEventListener("click", seleccionarLetra);
-      divTablero.appendChild(letraDiv);
+
+      columna.appendChild(letraDiv);
     }
-  }
+  });
+}
+
+function obtenerLetraAleatoria(letras) {
+  return letras.charAt(Math.floor(Math.random() * letras.length));
 }
 
 function seleccionarLetra(event) {
@@ -100,23 +128,50 @@ function seleccionarLetra(event) {
     return;
   }
 
-  letraDiv.classList.add("seleccionada");
-  ultimaLetraSeleccionada = { fila: fila, columna: columna };
-  inputPalabraActual.value += letraDiv.textContent;
-}
-
-function esLetraContigua(fila, columna) {
-  if (!ultimaLetraSeleccionada) {
-    return true;
+  if (
+    letrasSeleccionadas.some(function (item) {
+      return item.fila === fila && item.columna === columna;
+    })
+  ) {
+    return;
   }
 
-  var filaAnterior = ultimaLetraSeleccionada.fila;
-  var columnaAnterior = ultimaLetraSeleccionada.columna;
+  letrasSeleccionadas.push({
+    letra: letraDiv.textContent,
+    fila: fila,
+    columna: columna,
+  });
 
-  return (
-    Math.abs(fila - filaAnterior) <= 1 &&
-    Math.abs(columna - columnaAnterior) <= 1
+  inputPalabraActual.value = letrasSeleccionadas
+    .map(function (item) {
+      return item.letra;
+    })
+    .join("");
+
+  letraDiv.classList.add("seleccionada");
+
+  actualizarUltimaSeleccionada();
+}
+
+function actualizarUltimaSeleccionada() {
+  var ultimaSeleccionadaAnterior = document.querySelector(
+    ".ultima-seleccionada"
   );
+  if (ultimaSeleccionadaAnterior) {
+    ultimaSeleccionadaAnterior.classList.remove("ultima-seleccionada");
+  }
+
+  if (letrasSeleccionadas.length > 0) {
+    var ultimaSeleccionadaActual =
+      letrasSeleccionadas[letrasSeleccionadas.length - 1];
+    var selector = `.columna-tablero:nth-child(${
+      ultimaSeleccionadaActual.columna + 1
+    }) .letra:nth-child(${ultimaSeleccionadaActual.fila + 1})`;
+    var ultimaLetraDiv = document.querySelector(selector);
+    if (ultimaLetraDiv) {
+      ultimaLetraDiv.classList.add("ultima-seleccionada");
+    }
+  }
 }
 
 function enviarPalabra() {
@@ -124,32 +179,92 @@ function enviarPalabra() {
 
   if (palabra.length < 3) {
     mostrarModal("Error", "La palabra debe tener al menos 3 letras.");
+    reiniciarTablero();
     return;
   }
 
   if (palabrasEncontradas.includes(palabra)) {
     mostrarModal("Error", "Esta palabra ya ha sido encontrada.");
+    reiniciarTablero();
     return;
   }
 
-  palabrasEncontradas.push(palabra);
-  puntaje += palabra.length;
-  spanPuntaje.textContent = puntaje;
+  validarPalabraExistente(palabra)
+    .then(function (esValida) {
+      if (!esValida) {
+        mostrarModal("Error", "Esta palabra no es válida.");
+        reiniciarTablero();
+        return;
+      }
 
-  var li = document.createElement("li");
-  li.textContent = palabra;
-  listaPalabras.appendChild(li);
+      palabrasEncontradas.push(palabra);
+      var puntos = calcularPuntos(palabra.length);
+      puntaje += puntos;
+      spanPuntaje.textContent = puntaje;
 
-  inputPalabraActual.value = "";
-  ultimaLetraSeleccionada = null;
-  var letrasSeleccionadas = document.querySelectorAll(".letra.seleccionada");
-  letrasSeleccionadas.forEach(function (letra) {
-    letra.classList.remove("seleccionada");
-  });
+      var li = document.createElement("li");
+      li.textContent = palabra + " (" + puntos + " puntos)";
+      listaPalabras.appendChild(li);
+
+      letrasSeleccionadas = [];
+      inputPalabraActual.value = "";
+
+      var letrasSeleccionadasDOM = document.querySelectorAll(
+        ".letra.seleccionada"
+      );
+      letrasSeleccionadasDOM.forEach(function (letra) {
+        letra.classList.remove("seleccionada");
+        letra.classList.remove("ultima-seleccionada");
+      });
+    })
+    .catch(function (error) {
+      mostrarModal("Error", "Hubo un problema al validar la palabra.");
+      console.error(error);
+      reiniciarTablero();
+    });
+}
+
+function validarPalabraExistente(palabra) {
+  var url = "https://api.dictionaryapi.dev/api/v2/entries/en/" + palabra;
+  return fetch(url)
+    .then(function (response) {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then(function (data) {
+      return data && data.length > 0;
+    })
+    .catch(function (error) {
+      console.error("Error al validar la palabra:", error);
+      return false;
+    });
+}
+
+function esLetraContigua(fila, columna) {
+  var ultimaLetra = letrasSeleccionadas[letrasSeleccionadas.length - 1];
+
+  if (!ultimaLetra) {
+    return true;
+  }
+
+  var filaAnterior = ultimaLetra.fila;
+  var columnaAnterior = ultimaLetra.columna;
+
+  return (
+    Math.abs(fila - filaAnterior) <= 1 &&
+    Math.abs(columna - columnaAnterior) <= 1
+  );
+}
+
+function calcularPuntos(longitudPalabra) {
+  return longitudPalabra;
 }
 
 function iniciarTemporizador() {
   var tiempoRestante = tiempoJuego;
+  spanTemporizador.textContent = tiempoRestante;
   temporizador = setInterval(function () {
     tiempoRestante--;
     spanTemporizador.textContent = tiempoRestante;
@@ -180,6 +295,17 @@ function reiniciarJuego() {
   seccionJuego.classList.remove("oculto");
 }
 
+function reiniciarTablero() {
+  letrasSeleccionadas = [];
+  inputPalabraActual.value = "";
+
+  var letrasSeleccionadasDOM = document.querySelectorAll(".letra.seleccionada");
+  letrasSeleccionadasDOM.forEach(function (letra) {
+    letra.classList.remove("seleccionada");
+    letra.classList.remove("ultima-seleccionada");
+  });
+}
+
 function guardarResultado() {
   var resultados = JSON.parse(localStorage.getItem("resultadosBoggle")) || [];
   resultados.push({
@@ -187,7 +313,8 @@ function guardarResultado() {
     puntaje: puntaje,
     fecha: new Date().toISOString(),
   });
-  localStorage.setItem("resultBoggle", JSON.stringify(resultados));
+
+  localStorage.setItem("resultadosBoggle", JSON.stringify(resultados));
 }
 
 function mostrarResultados() {
@@ -199,12 +326,17 @@ function mostrarResultados() {
 
   var resultados = JSON.parse(localStorage.getItem("resultadosBoggle")) || [];
   resultados
-    .sort((a, b) => b.puntaje - a.puntaje) // Ordenar por puntaje descendente
+    .sort(function (a, b) {
+      return b.puntaje - a.puntaje;
+    })
     .forEach(function (resultado) {
       var li = document.createElement("li");
-      li.textContent = `${resultado.nombre} - ${
-        resultado.puntaje
-      } puntos (${new Date(resultado.fecha).toLocaleDateString("es-ES")})`;
+      li.textContent =
+        resultado.nombre +
+        " - " +
+        resultado.puntaje +
+        " puntos - " +
+        new Date(resultado.fecha).toLocaleDateString();
       listaResultados.appendChild(li);
     });
 }
@@ -217,9 +349,9 @@ function volverAlInicio() {
 function mostrarModal(titulo, mensaje) {
   modalTitulo.textContent = titulo;
   modalMensaje.textContent = mensaje;
-  modal.classList.remove("oculto");
+  modal.style.display = "block";
 }
 
 function cerrarModal() {
-  modal.classList.add("oculto");
+  modal.style.display = "none";
 }
