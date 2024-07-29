@@ -1,5 +1,5 @@
 # Proyecto: Boogle - Desarrollo y Arquitectura Web 
-![Inicio del sitio web](/imagenDelProyecto)
+![Inicio del sitio web](/imagenDelProyecto.png)
 ## Universidad
 Universidad Abierta Interamericana (UAI)
 
