@@ -163,9 +163,7 @@ function actualizarUltimaSeleccionada() {
   if (letrasSeleccionadas.length > 0) {
     var ultimaSeleccionadaActual =
       letrasSeleccionadas[letrasSeleccionadas.length - 1];
-    var selector = `.columna-tablero:nth-child(${
-      ultimaSeleccionadaActual.columna + 1
-    }).letra:nth-child(${ultimaSeleccionadaActual.fila + 1})`;
+    var selector = `.columna-tablero[data-columna="${ultimaSeleccionadaActual.columna}"] .letra[data-fila="${ultimaSeleccionadaActual.fila}"]`;
     var ultimaLetraDiv = document.querySelector(selector);
     if (ultimaLetraDiv) {
       ultimaLetraDiv.classList.add("ultima-seleccionada");
