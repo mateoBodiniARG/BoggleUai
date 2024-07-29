@@ -1,6 +1,6 @@
 # Proyecto: Boogle - Desarrollo y Arquitectura Web 
 ![Inicio del sitio web](/imagenDelProyecto.png)
-## Universidad
+## Facultad
 Universidad Abierta Interamericana (UAI)
 
 ## Materia
@@ -11,8 +11,7 @@ Desarrollo y Arquitectura Web
 - Mateo Bodini
 
 ## Profesores
-Darío Marañes
-Dino Stampella
+Darío Marañes - Dino Stampella
 
 ## Descripción del Proyecto
 Este proyecto consiste en el desarrollo de un juego de palabras llamado **Boogle** utilizando HTML5, CSS3 y JavaScript (ES5). El objetivo del juego es formar la mayor cantidad de palabras posibles en un tiempo determinado. 
