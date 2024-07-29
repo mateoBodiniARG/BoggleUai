@@ -39,8 +39,8 @@ btnVerResultados.addEventListener("click", mostrarResultados);
 btnVolverInicio.addEventListener("click", volverAlInicio);
 btnCerrarModal.addEventListener("click", cerrarModal);
 
-function iniciarJuego(event) {
-  event.preventDefault();
+function iniciarJuego(e) {
+  e.preventDefault();
   nombreJugador = document.getElementById("nombre-jugador").value;
   tiempoJuego = parseInt(document.getElementById("tiempo-juego").value);
 
@@ -73,9 +73,8 @@ function generarTablero() {
   var tablero = [[], [], [], []];
   var letras = [];
 
-  var totalCeldas = 16;
-  var cantidadVocales = Math.floor(totalCeldas * 0.4);
-  var cantidadConsonantes = totalCeldas - cantidadVocales;
+  var cantidadVocales = 6;
+  var cantidadConsonantes = 10;
 
   for (var i = 0; i < cantidadVocales; i++) {
     letras.push(obtenerLetraAleatoria(vocales));
@@ -166,7 +165,7 @@ function actualizarUltimaSeleccionada() {
       letrasSeleccionadas[letrasSeleccionadas.length - 1];
     var selector = `.columna-tablero:nth-child(${
       ultimaSeleccionadaActual.columna + 1
-    }) .letra:nth-child(${ultimaSeleccionadaActual.fila + 1})`;
+    }).letra:nth-child(${ultimaSeleccionadaActual.fila + 1})`;
     var ultimaLetraDiv = document.querySelector(selector);
     if (ultimaLetraDiv) {
       ultimaLetraDiv.classList.add("ultima-seleccionada");
@@ -194,6 +193,8 @@ function enviarPalabra() {
       if (!esValida) {
         mostrarModal("Error", "Esta palabra no es válida.");
         reiniciarTablero();
+        puntaje--;
+        spanPuntaje.textContent = puntaje;
         return;
       }
 
@@ -224,29 +225,26 @@ function enviarPalabra() {
     });
 }
 
-function validarPalabraExistente(palabra) {
+async function validarPalabraExistente(palabra) {
   var url = "https://api.dictionaryapi.dev/api/v2/entries/en/" + palabra;
-  return fetch(url)
-    .then(function (response) {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
-    .then(function (data) {
-      return data && data.length > 0;
-    })
-    .catch(function (error) {
-      console.error("Error al validar la palabra:", error);
-      return false;
-    });
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await response.json();
+    return data && data.length > 0;
+  } catch (error) {
+    console.error("Error al validar la palabra:", error);
+    return false;
+  }
 }
 
 function esLetraContigua(fila, columna) {
   var ultimaLetra = letrasSeleccionadas[letrasSeleccionadas.length - 1];
 
   if (!ultimaLetra) {
-    return true;
+    return true; //permite seleccionar la letra si no hay ninguna seleccionada
   }
 
   var filaAnterior = ultimaLetra.fila;
@@ -259,7 +257,11 @@ function esLetraContigua(fila, columna) {
 }
 
 function calcularPuntos(longitudPalabra) {
-  return longitudPalabra;
+  if (longitudPalabra >= 8) return 11;
+  if (longitudPalabra === 7) return 5;
+  if (longitudPalabra === 6) return 3;
+  if (longitudPalabra === 5) return 2;
+  if (longitudPalabra === 3 || longitudPalabra === 4) return 1;
 }
 
 function iniciarTemporizador() {
