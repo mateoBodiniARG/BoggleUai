@@ -120,36 +120,39 @@ function obtenerLetraAleatoria(letras) {
 
 function seleccionarLetra(event) {
   var letraDiv = event.target;
+
   var fila = parseInt(letraDiv.dataset.fila);
   var columna = parseInt(letraDiv.dataset.columna);
 
-  if (!esLetraContigua(fila, columna)) {
-    return;
-  }
-
-  if (
-    letrasSeleccionadas.some(function (item) {
-      return item.fila === fila && item.columna === columna;
-    })
-  ) {
-    return;
-  }
-
-  letrasSeleccionadas.push({
-    letra: letraDiv.textContent,
-    fila: fila,
-    columna: columna,
+  var indiceLetra = letrasSeleccionadas.findIndex(function (item) {
+    return item.fila === fila && item.columna === columna;
   });
+
+  if (indiceLetra >= 0) {
+    letrasSeleccionadas.splice(indiceLetra, 1);
+    letraDiv.classList.remove("seleccionada");
+    actualizarUltimaSeleccionada();
+  } else {
+    // Si la letra no está seleccionada, verifica si es contigua
+    if (!esLetraContigua(fila, columna)) {
+      return;
+    }
+    // Si la letra es contigua, la selecciona
+    letrasSeleccionadas.push({
+      letra: letraDiv.textContent,
+      fila: fila,
+      columna: columna,
+    });
+
+    letraDiv.classList.add("seleccionada");
+    actualizarUltimaSeleccionada();
+  }
 
   inputPalabraActual.value = letrasSeleccionadas
     .map(function (item) {
       return item.letra;
     })
     .join("");
-
-  letraDiv.classList.add("seleccionada");
-
-  actualizarUltimaSeleccionada();
 }
 
 function actualizarUltimaSeleccionada() {

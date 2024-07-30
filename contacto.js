@@ -9,9 +9,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const mensaje = document.getElementById("mensaje-contacto").value;
 
     const asunto = encodeURIComponent("Formulario de Contacto");
-    const cuerpo = encodeURIComponent(`Nombre: ${nombre}\nEmail: ${email}\n\nMensaje:\n${mensaje}`);
-    const destinatario = "lucas.quaroni@gmail.com";
-    const mailtoLink = `mailto:${destinatario}?subject=${asunto}&body=${cuerpo}`;
+    const cuerpo = encodeURIComponent(
+      `Nombre: ${nombre}\nEmail: ${email}\n\nMensaje:\n${mensaje}`
+    );
+    const mailtoLink = `mailto:${email}?subject=${asunto}&body=${cuerpo}`;
 
     window.location.href = mailtoLink;
   });
